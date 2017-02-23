@@ -1,14 +1,5 @@
 # -*- coding: UTF-8 -*-
 
-'''
-Proj No. : 102
-Proj Name: Integration of industry and commerce
-Version  : 0.1.0
-Author   : Adas Co.LZL
-Created on Feb. 9, 2017
-'''
-
-import re
 from random import randint
 
 import MySQLdb
@@ -26,6 +17,7 @@ class PickUpCoordinates(object):
         self.conn = conn
 
     def pick_ll_main(self):
+        """执行获取经纬度的主函数"""
         cur_select = conn.cursor()
         cur_update = conn.cursor()
         res = self._get_samples_with_no_ll(cur_select)
@@ -33,8 +25,13 @@ class PickUpCoordinates(object):
         cur_select.close()
         cur_update.close()
 
-    #从数据库中获取内容
+
     def _get_samples_with_no_ll(self, cur_select):
+        """从数据库中抽取没有包含经纬度的样本
+
+        :param cur_select: 查询数据的cursor
+        :return: cur_select
+        """
         sql = "SELECT " \
               " registered_no," \
               " companyaddress " \
@@ -43,8 +40,12 @@ class PickUpCoordinates(object):
         cur_select.execute(sql)
         return cur_select
 
-    # 解析一条地址
     def _gain_ll(self, sample_info, cur_update):
+        """获取单条样本的经纬度信息，并执行更新数据库的命令
+
+        :param sample_info: 样本信息
+        :param cur_update: 更新数据库的cursor
+        """
         params = {
             'address': '%s' % sample_info[1],
             'output': 'json',
@@ -62,8 +63,8 @@ class PickUpCoordinates(object):
         cur_update.execute(sql_update)
         print('%s 经纬度被写入 !' % sample_info[0])
 
-    #间歇调用地址解析函数
     def _loop_gain_ll(self, res, cur_select, cur_update):
+        """循环获取经纬度的信息"""
         failure = 0
         while res > 0:
             try:
