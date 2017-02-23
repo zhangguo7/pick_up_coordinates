@@ -68,7 +68,7 @@ class PickUpCoordinates(object):
             try:
                 sample_info = cur_select.fetchone()
                 self._gain_ll(sample_info, cur_update)
-                i = chisquare(3)
+                i = chisquare(0.5)
                 time.sleep(i)
             except:
                 failure += 1
