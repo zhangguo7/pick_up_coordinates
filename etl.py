@@ -39,7 +39,7 @@ class ETL(object):
             sql_insert = 'INSERT INTO craw_raw (' \
                          ' registered_no,' \
                          ' company_name,' \
-                         ' prov_id,' \
+                         ' prip_id,' \
                          ' company_type,' \
                          ' legal_person,' \
                          ' registered_capital,' \
@@ -53,18 +53,22 @@ class ETL(object):
                          ' tel) ' \
                          'values("%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s","%s")'\
                          %tuple(row)
+            sql_insert = sql_insert.replace('nan','')
             try:
                 cur.execute(sql_insert)
                 success += 1
             except:
+                print sql_insert
                 failure += 1
             print '导入 成功:%d Obs.；失败:%d Obs.'% (success,failure)
-
+        self.conn.commit()
+        cur.close()
+        self.conn.close()
 
 if __name__ == '__main__':
     file_path = 'henan1000_test.txt'
     # file_path = input('请指定原始文件地址(文件名至于引号中)：')
-    conn = MySQLdb.connect(host='192.168.248.18',user='root',passwd='123456',
+    conn = MySQLdb.connect(host='localhost',user='root',passwd='123456',
                            charset='utf8',db='pick_up_coordinates')
 
     etl_obj = ETL(conn,file_path)
