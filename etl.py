@@ -60,14 +60,13 @@ class ETL(object):
             except:
                 print sql_insert
                 failure += 1
-            print '导入 成功:%d Obs.；失败:%d Obs.'% (success,failure)
+            print u'导入 成功:%d Obs.；失败:%d Obs.'% (success,failure)
         self.conn.commit()
         cur.close()
         self.conn.close()
 
 if __name__ == '__main__':
-    file_path = 'henan1000_test.txt'
-    # file_path = input('请指定原始文件地址(文件名至于引号中)：')
+    file_path = input('Input the file path of raw data:')
     conn = MySQLdb.connect(host='localhost',user='root',passwd='123456',
                            charset='utf8',db='pick_up_coordinates')
 

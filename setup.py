@@ -26,7 +26,7 @@ class Setup(object):
                           ' `contacts` varchar(255) DEFAULT NULL,' \
                           ' `money` varchar(20) DEFAULT NULL,' \
                           ' `tel` varchar(11) DEFAULT NULL,' \
-                          ' `longtitude` decimal(19,16) DEFAULT NULL,' \
+                          ' `longitude` decimal(19,16) DEFAULT NULL,' \
                           ' `latitude` decimal(19,16) DEFAULT NULL,' \
                           ' PRIMARY KEY (`id`)' \
                           ') ENGINE=InnoDB AUTO_INCREMENT=9122 DEFAULT CHARSET=utf8'
@@ -41,7 +41,9 @@ class Setup(object):
         self.conn.close()
 
 if __name__ == '__main__':
+    print u'正在安装 获取经纬度模块...'
     conn = MySQLdb.connect(host='localhost',user='root',passwd='123456',
                            charset='utf8',db='pick_up_coordinates')
     init_obj = Setup(conn)
     init_obj.setup()
+    print u'安装完毕!'

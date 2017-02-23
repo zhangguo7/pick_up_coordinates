@@ -1,10 +1,9 @@
 # -*- coding: UTF-8 -*-
-
-from random import randint
-
 import MySQLdb
 import requests
 import time
+
+from numpy.random import chisquare
 
 class PickUpCoordinates(object):
     """拾取经纬度坐标
@@ -21,10 +20,9 @@ class PickUpCoordinates(object):
         cur_select = conn.cursor()
         cur_update = conn.cursor()
         res = self._get_samples_with_no_ll(cur_select)
-        self._loop_gain_ll(res, cur_select,cur_update)
+        self._loop_gain_ll(cur_select,cur_update)
         cur_select.close()
         cur_update.close()
-
 
     def _get_samples_with_no_ll(self, cur_select):
         """从数据库中抽取没有包含经纬度的样本
@@ -34,9 +32,9 @@ class PickUpCoordinates(object):
         """
         sql = "SELECT " \
               " registered_no," \
-              " companyaddress " \
-              "From test " \
-              "WHERE companyaddress != ''"
+              " company_address " \
+              "From craw_raw " \
+              "WHERE company_address != ''"
         cur_select.execute(sql)
         return cur_select
 
@@ -55,40 +53,38 @@ class PickUpCoordinates(object):
         response = requests.get(url, params)
         dict = response.json()['result']['location']
         lat, lng = dict['lat'], dict['lng']
-        sql_update = "UPDATE test SET " \
-                     " longitude='%s'," \
-                     " latitude='%s' " \
+        sql_update = "UPDATE craw_raw SET " \
+                     " longitude = %.16f," \
+                     " latitude = %.16f " \
                      "WHERE registered_no='%s' " \
                   % (lat, lng, sample_info[0])
         cur_update.execute(sql_update)
-        print('%s 经纬度被写入 !' % sample_info[0])
+        print(u'%s 经纬度被写入 !' % sample_info[0])
 
-    def _loop_gain_ll(self, res, cur_select, cur_update):
+    def _loop_gain_ll(self, cur_select, cur_update):
         """循环获取经纬度的信息"""
         failure = 0
-        while res > 0:
+        while cur_select.rownumber < cur_select.rowcount:
             try:
                 sample_info = cur_select.fetchone()
                 self._gain_ll(sample_info, cur_update)
-                res -= 1
-                i = randint(1, 100)
+                i = chisquare(3)
                 time.sleep(i)
             except:
                 failure += 1
-                print('经纬度获取失败，累计获取失败样本：%d 条'%failure)
+                print(u'经纬度获取失败，累计获取失败样本：%d 条'%failure)
             finally:
                 self.conn.commit()
 
 if __name__ == "__main__":
     conn = MySQLdb.connect(host='localhost',user='root',passwd='123456',
-                           db='test',charset='utf8')
-						   
-    parser_address = PickUpCoordinates(conn)
-
+                           charset='utf8',db='pick_up_coordinates')
+    puc_obj = PickUpCoordinates(conn)
+    puc_obj.pick_ll_main()
     try:
-        parser_address.pick_ll_main()
+        puc_obj.pick_ll_main()
     except Exception as e:
         print(e)
     finally:
         conn.close()
-        print('所有经纬度获取完成 !')
+        print(u'所有经纬度获取完成 !')
