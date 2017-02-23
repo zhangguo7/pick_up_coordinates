@@ -12,14 +12,15 @@ class PickUpCoordinates(object):
     传递到百度api获取经纬度
     将获取结果回写数据库
     """
-    def __init__(self, conn):
+    def __init__(self, conn,ak):
         self.conn = conn
+        self.ak = ak
 
     def pick_ll_main(self):
         """执行获取经纬度的主函数"""
         cur_select = conn.cursor()
         cur_update = conn.cursor()
-        res = self._get_samples_with_no_ll(cur_select)
+        self._get_samples_with_no_ll(cur_select)
         self._loop_gain_ll(cur_select,cur_update)
         cur_select.close()
         cur_update.close()
@@ -47,7 +48,7 @@ class PickUpCoordinates(object):
         params = {
             'address': '%s' % sample_info[1],
             'output': 'json',
-            'ak': 'S4vNqfh4my5U3Om71yuch99cUEq05Ckm'
+            'ak': '%s' %self.ak
         }
         url = 'http://api.map.baidu.com/geocoder/v2/'
         response = requests.get(url, params)
@@ -79,7 +80,8 @@ class PickUpCoordinates(object):
 if __name__ == "__main__":
     conn = MySQLdb.connect(host='localhost',user='root',passwd='123456',
                            charset='utf8',db='pick_up_coordinates')
-    puc_obj = PickUpCoordinates(conn)
+    ak = open('ak').read()
+    puc_obj = PickUpCoordinates(conn,ak)
     puc_obj.pick_ll_main()
     try:
         puc_obj.pick_ll_main()
