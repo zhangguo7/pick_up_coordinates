@@ -6,9 +6,6 @@ class Setup(object):
 
     def __init__(self,conn):
         self.conn = conn
-        self.drop_db = 'DROP DATABASE IF EXISTS `pick_up_coordinates`'
-        self.create_db = 'CREATE database IF NOT EXISTS `pick_up_coordinates`'
-        self.select_db = 'USE `pick_up_coordinates`'
         self.drop_table = 'DROP TABLE IF EXISTS `craw_raw`'
         self.create_table = 'CREATE TABLE IF NOT EXISTS`craw_raw` (' \
                           ' `id` int(11) NOT NULL AUTO_INCREMENT,' \
@@ -32,9 +29,7 @@ class Setup(object):
                           ') ENGINE=InnoDB AUTO_INCREMENT=9122 DEFAULT CHARSET=utf8'
     def setup(self):
         cur = self.conn.cursor()
-        cur.execute(self.drop_db)
-        cur.execute(self.create_db)
-        cur.execute(self.select_db)
+        cur.execute(self.drop_table)
         cur.execute(self.create_table)
         self.conn.commit()
         cur.close()
