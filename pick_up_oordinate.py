@@ -80,7 +80,7 @@ class PickUpCoordinates(object):
 if __name__ == "__main__":
     conn = MySQLdb.connect(host='localhost',user='root',passwd='123456',
                            charset='utf8',db='pick_up_coordinates')
-    ak = open('ak').read()
+    ak = open('ak_raw').read()
     puc_obj = PickUpCoordinates(conn,ak)
     puc_obj.pick_ll_main()
     try:
